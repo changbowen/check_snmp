@@ -1,5 +1,5 @@
 ## check_snmp
-##### Python script that checks components status against Dell or HPE servers with snmpwalk command
+#### Python script that checks components status against Dell or HPE servers with snmpwalk command
 
 Usage: `check_snmp.py <ip_or_hostname>`
 
