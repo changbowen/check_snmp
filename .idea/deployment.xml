@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="WebSrvTest">
+    <serverData>
+      <paths name="WebSrvTest">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/check_snmp" local="$PROJECT_DIR$" web="/check_snmp" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
