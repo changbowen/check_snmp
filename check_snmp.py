@@ -7,9 +7,12 @@ from typing import NamedTuple
 
 
 _parser = argparse.ArgumentParser()
+_parser.add_argument('-r', help='Respect properties marked as important when other results contain errors.', action='store_true')
 _parser.add_argument('host', help='The host to connect to.')
 _args = _parser.parse_args()
 Host = _args.host
+RespectImp = _args.r
+
 
 # get base folder
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -20,47 +23,47 @@ Config = {
         'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/dell',
         'mib': 'IDRAC-MIB-SMIv2',
         'oids': OrderedDict([
-            ('globalSystemStatus', 'Overall system status'),
-            ('systemStateProcessorDeviceStatusCombined', 'Processor status'),
-            ('memoryDeviceStatus', 'Memory status'),
-            ('physicalDiskState', 'Physical disk status'),
-            ('virtualDiskState', 'Virtual disk status'),
-            ('controllerComponentStatus', 'Storage controller status'),
-            ('coolingUnitStatus', 'Cooling status'),
-            ('temperatureProbeStatus', 'Temperature status'),
-            ('powerSupplyStatus', 'Power supply status'),
-            ('systemStateBatteryStatusCombined', 'Battery status'),
+            ('globalSystemStatus',                          {'description': 'Overall system status', 'important': True}),
+            ('systemStateProcessorDeviceStatusCombined',    {'description': 'Processor status'}),
+            ('memoryDeviceStatus',                          {'description': 'Memory status'}),
+            ('physicalDiskState',                           {'description': 'Physical disk status'}),
+            ('virtualDiskState',                            {'description': 'Virtual disk status'}),
+            ('controllerComponentStatus',                   {'description': 'Storage controller status'}),
+            ('coolingUnitStatus',                           {'description': 'Cooling status'}),
+            ('temperatureProbeStatus',                      {'description': 'Temperature status'}),
+            ('powerSupplyStatus',                           {'description': 'Power supply status'}),
+            ('systemStateBatteryStatusCombined',            {'description': 'Battery status'}),
         ])
     },
     'hpe': {
         'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/hpe',
         'mib': 'CPQSINFO-MIB:CPQHLTH-MIB:CPQIDA-MIB',
         'oids': OrderedDict([
-            ('cpqHeMibCondition', 'Overall system status'),
-            ('cpqHeResilientMemCondition', 'Memory status'),
-            ('cpqDaPhyDrvCondition', 'Physical disk status'),
-            ('cpqDaMibCondition', 'Virtual disk status'),
-            ('cpqDaCntlrCondition', 'Storage controller status'),
-            ('cpqHeThermalSystemFanStatus', 'Cooling status'),
-            ('cpqHeThermalTempStatus', 'Temperature status'),
-            ('cpqHeFltTolPowerSupplyCondition', 'Power supply status'),
-            ('cpqHeEventLogCondition', 'Integrated Management Log status'),
+            ('cpqHeMibCondition',                   {'description': 'Overall system status', 'important': True}),
+            ('cpqHeResilientMemCondition',          {'description': 'Memory status'}),
+            ('cpqDaPhyDrvCondition',                {'description': 'Physical disk status'}),
+            ('cpqDaMibCondition',                   {'description': 'Virtual disk status'}),
+            ('cpqDaCntlrCondition',                 {'description': 'Storage controller status'}),
+            ('cpqHeThermalSystemFanStatus',         {'description': 'Cooling status'}),
+            ('cpqHeThermalTempStatus',              {'description': 'Temperature status'}),
+            ('cpqHeFltTolPowerSupplyCondition',     {'description': 'Power supply status'}),
+            ('cpqHeEventLogCondition',              {'description': 'Integrated Management Log status'}),
         ])
     }
 }
 StatusOK = ('ok', 'true', 'yes', 'on', 'online', 'spunup', 'full', 'ready', 'enabled', 'presence', 'non-raid', 'nonraid', 0)
-StatusWarning = ('noncritical')
+StatusWarning = ('noncritical', 'removed', 'foreign', 'offline')
 StatusCritical = ('fail', 'failed', 'critical', 'nonrecoverable', 'notredundant', 'lost', 'degraded', 'redundancyoffline')
 StatusMap = {
-    0: {'status': 'ok', 'color': '\033[32m{}\033[00m'},  # green
-    1: {'status': 'warning', 'color': '\033[33m{}\033[00m'},  # orange
-    2: {'status': 'critical', 'color': '\033[31m{}\033[00m'},  # red
-    3: {'status': 'unknown', 'color': '\033[37m{}\033[00m'},  # lightgrey
+    0: {'status': 'ok',         'color': '\033[32m{}\033[00m',  'severity': 0},  # green
+    1: {'status': 'warning',    'color': '\033[33m{}\033[00m',  'severity': 2},  # orange
+    2: {'status': 'critical',   'color': '\033[31m{}\033[00m',  'severity': 3},  # red
+    3: {'status': 'unknown',    'color': '\033[37m{}\033[00m',  'severity': 1},  # lightgrey
 }
 
 SnmpCommand = NamedTuple('SnmpCommand', [('command', str), ('host', str), ('oid', str), ('mib_dir', str), ('mib', str), ('value_only', bool)])
 SnmpResult = NamedTuple('SnmpResult', [('stdout', str), ('stderr', str)])
-CombinedStatus = NamedTuple('CombinedStatus', [('ok', int), ('warning', int), ('critical', int), ('unknown', int)])
+CombinedStatus = NamedTuple('CombinedStatus', [('code', int), ('formatted', str)])
 
 
 def run(cmd: SnmpCommand) -> SnmpResult:
@@ -80,44 +83,48 @@ def print_and_exit(msg: str, code: int):
     sys.exit(code)
 
 
-def status_converter(status: any) -> str:
+def status_converter(status: any) -> int:
     if status in StatusOK:
-        return 'ok'
+        return 0  # ok
     elif status in StatusWarning:
-        return 'warning'
+        return 1  # warning
     elif status in StatusCritical:
-        return 'critical'
+        return 2  # critical
     else:
-        return 'unknown'
+        return 3  # unknown
 
 
 def multi_status_converter(status_str: str) -> CombinedStatus:
-    ok, warning, critical, unknown = 0, 0, 0, 0
+    combined, formatted = 0, ''
     for s in status_str.splitlines():
-        status = status_converter(s)
-        if status == 'ok':
-            ok += 1
-        elif status == 'warning':
-            warning += 1
-        elif status == 'critical':
-            critical += 1
-        else:
-            unknown += 1
+        formatted += s + '|'
+        combined = update_status_code(combined, status_converter(s))
 
-    return CombinedStatus(ok, warning, critical, unknown)
+    if len(formatted) > 1: formatted = formatted[:-1]
+    return CombinedStatus(combined, formatted)
 
 
-def status_merger(ok: int, warning: int, critical: int, unknown: int) -> int:
-    if critical > 0:
-        return 2
-    elif warning > 0:
-        return 1
-    elif unknown > 0:
-        return 3
-    elif ok > 0:
-        return 0
+# def status_merger(ok: int, warning: int, critical: int, unknown: int) -> int:
+#     if critical > 0:
+#         return 2
+#     elif warning > 0:
+#         return 1
+#     elif unknown > 0:
+#         return 3
+#     elif ok > 0:
+#         return 0
+#     else:
+#         return 3
+
+
+def update_status_code(old_status_code: int, status_code: int) -> int:
+    if status_code not in StatusMap: print_and_exit('Unknown status code.', 3)
+    if old_status_code not in StatusMap: return status_code
+
+    if StatusMap[old_status_code]['severity'] < StatusMap[status_code]['severity']:
+        return status_code
     else:
-        return 3
+        return old_status_code
 
 
 # execution
@@ -134,25 +141,29 @@ else:
     print_and_exit('Unknown vendor information.', 3)
 
 
-combinedOk, combinedWarning, combinedCritical, combinedUnknown, exitCode = 0, 0, 0, 0, 3
+exitCode, exitCodeImp = -1, -1
 for oid in Config[Vendor]['oids']:
     vendor = Config[Vendor]
     mib_dir = vendor['mib_dir']
     mib = vendor['mib']
-    desc = vendor['oids'][oid]
+    desc = vendor['oids'][oid]['description']
+    imp = vendor['oids'][oid].get('important') is True
+
     result = run(SnmpCommand('snmpwalk', Host, oid, mib_dir, mib, True))
-
     cs = multi_status_converter(result.stdout)
-    combinedOk += cs.ok
-    combinedWarning += cs.warning
-    combinedCritical += cs.critical
-    combinedUnknown += cs.unknown
+    if imp: exitCodeImp = update_status_code(exitCodeImp, cs.code)
+    exitCode = update_status_code(exitCode, cs.code)
 
-    merged_status = StatusMap[status_merger(cs.ok, cs.warning, cs.critical, cs.unknown)]
-    print('{desc}: {status}'.format(desc=desc, status=merged_status['color'].format(merged_status['status'])))
+    result_status = StatusMap[cs.code]
+    print('{desc}: {status} ({formatted})'.format(desc=desc,
+                                                  status=result_status['color'].format(result_status['status']),
+                                                  formatted=cs.formatted))
 
+# what if there is no important in Config?
+if RespectImp and exitCodeImp > -1:
+    sys.exit(exitCodeImp)
+else:
+    sys.exit(exitCode)
 
-exitCode = status_merger(combinedOk, combinedWarning, combinedCritical, combinedUnknown)
-sys.exit(exitCode)
 # print_and_exit('Query completed.', exitCode)
 
