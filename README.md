@@ -36,11 +36,11 @@ Integer value that is inline with the Nagios exit codes.
 The most severe status is preserved and used as return value. 
 
 Exit Code | Status
-      --- | ---
-       0  | OK
-       1  | WARNING
-       2  | CRITICAL
-       3  | UNKNOWN
+--- | ---
+0 | OK
+1 | WARNING
+2 | CRITICAL
+3 | UNKNOWN
        
 ### Loading MIB
 For Dell only one MIB module `IDRAC-MIB-SMIv2` needs to be specified in the snmpwalk command with `-m` option.
