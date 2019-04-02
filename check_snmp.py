@@ -7,15 +7,15 @@ from typing import NamedTuple
 
 
 _parser = argparse.ArgumentParser()
-_parser.add_argument('-v', help='The SNMP version to use.', default='2c')
-_parser.add_argument('-c', help='The community string to use.', default='public')
-_parser.add_argument('-r', help='Respect properties marked as important when other results contain errors.', action='store_true')
+_parser.add_argument('-v', dest='version', help='The SNMP version to use.', default='2c')
+_parser.add_argument('-c', dest='community', help='The community string to use.', default='public')
+_parser.add_argument('-r', dest='respect', help='Respect properties marked as important when other results contain errors.', action='store_true')
 _parser.add_argument('host', help='The host to connect to.')
 _args = _parser.parse_args()
 args_Host = _args.host
-args_Version = _args.v
-args_Community = _args.c
-args_RespectImp = _args.r
+args_Version = _args.version
+args_Community = _args.community
+args_RespectImp = _args.respect
 
 
 # get base folder
