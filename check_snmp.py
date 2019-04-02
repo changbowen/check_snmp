@@ -7,11 +7,15 @@ from typing import NamedTuple
 
 
 _parser = argparse.ArgumentParser()
+_parser.add_argument('-v', help='The SNMP version to use.', default='2c')
+_parser.add_argument('-c', help='The community string to use.', default='public')
 _parser.add_argument('-r', help='Respect properties marked as important when other results contain errors.', action='store_true')
 _parser.add_argument('host', help='The host to connect to.')
 _args = _parser.parse_args()
-Host = _args.host
-RespectImp = _args.r
+args_Host = _args.host
+args_Version = _args.v
+args_Community = _args.c
+args_RespectImp = _args.r
 
 
 # get base folder
@@ -67,7 +71,7 @@ CombinedStatus = NamedTuple('CombinedStatus', [('code', int), ('formatted', str)
 
 
 def run(cmd: SnmpCommand) -> SnmpResult:
-    cmdlst = [cmd.command, '-v', '2c', '-c', 'public']
+    cmdlst = [cmd.command, '-v', args_Version, '-c', args_Community]
     if cmd.value_only: cmdlst.append('-O'); cmdlst.append('qv')
     if cmd.mib_dir: cmdlst.append('-M'); cmdlst.append(cmd.mib_dir)
     if cmd.mib: cmdlst.append('-m'); cmdlst.append(cmd.mib)
@@ -129,7 +133,7 @@ def update_status_code(old_status_code: int, status_code: int) -> int:
 
 # execution
 # get vendor
-VendorResult = run(SnmpCommand('snmpgetnext', Host, '1.3.6.1.4.1', '', '', False))
+VendorResult = run(SnmpCommand('snmpgetnext', args_Host, '1.3.6.1.4.1', '', '', False))
 if VendorResult.stderr:
     print_and_exit(VendorResult.stderr, 3)
 
@@ -149,7 +153,7 @@ for oid in Config[Vendor]['oids']:
     desc = vendor['oids'][oid]['description']
     imp = vendor['oids'][oid].get('important') is True
 
-    result = run(SnmpCommand('snmpwalk', Host, oid, mib_dir, mib, True))
+    result = run(SnmpCommand('snmpwalk', args_Host, oid, mib_dir, mib, True))
     cs = multi_status_converter(result.stdout)
     if imp: exitCodeImp = update_status_code(exitCodeImp, cs.code)
     exitCode = update_status_code(exitCode, cs.code)
@@ -159,7 +163,7 @@ for oid in Config[Vendor]['oids']:
                                                   status=result_status['color'].format(result_status['status']),
                                                   formatted=cs.formatted))
 
-if RespectImp and exitCodeImp > -1:
+if args_RespectImp and exitCodeImp > -1:
     sys.exit(exitCodeImp)
 else:
     sys.exit(exitCode)
