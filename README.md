@@ -1,9 +1,9 @@
 ## check_snmp
 #### Python script that checks components status against Dell or HPE servers with snmpwalk command
 
-Usage: `check_snmp.py <ip_or_hostname>`
+Usage: `check_snmp.py [-h] [-r] host`
 
-For example `check_snmp.py 192.168.1.120`
+For example `check_snmp.py -r 192.168.1.120`
 
 The script will decide the manufacturer based on the OID returned on a initial call to snmpgetnext.
 
@@ -19,21 +19,24 @@ As one of my earliest Python projects, feel free to fork and make your own impro
 ### Sample Output
 ```
 sample@sample:~$ check_snmp.py -r 192.168.1.120
-Overall system status: ok
-Memory status: ok
-Physical disk status: ok
-Virtual disk status: ok
-Storage controller status: ok
-Cooling status: ok
-Temperature status: ok
-Power supply status: ok
-Integrated Management Log status: ok
+Overall system status: critical (critical)
+Processor status: ok (ok)
+Memory status: ok (ok|ok)
+Physical disk status: critical (online|online|removed|removed|removed|failed|online)
+Virtual disk status: critical (degraded)
+Storage controller status: ok (ok|ok)
+Cooling status: ok (ok)
+Temperature status: ok (ok|ok)
+Power supply status: ok (ok)
+Battery status: ok (ok)
 ```
 
 ### Return Value
 Integer value that is inline with the Nagios exit codes.
 
-The most severe status is preserved and used as return value. 
+For each OID, if there are multiple results (e.g. there may be more than one disk in the system), the most severe status is preserved and used as return value.
+By default the exit code will be the most severe one of all the results from the OIDs.
+If `-r` option is specified, the script will only check the OIDs marked as **important** when returning.  
 
 Exit Code | Status
 --- | ---
@@ -41,7 +44,7 @@ Exit Code | Status
 1 | WARNING
 2 | CRITICAL
 3 | UNKNOWN
-       
+
 ### Loading MIB
 For Dell only one MIB module `IDRAC-MIB-SMIv2` needs to be specified in the snmpwalk command with `-m` option.
 
