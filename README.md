@@ -18,7 +18,7 @@ As one of my earliest Python projects, feel free to fork and make your own impro
 
 ### Sample Output
 ```
-sample@sample:~$ check_snmp.py 192.168.1.120
+sample@sample:~$ check_snmp.py -r 192.168.1.120
 Overall system status: ok
 Memory status: ok
 Physical disk status: ok
