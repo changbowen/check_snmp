@@ -5,7 +5,7 @@ Usage: `check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] host`
 
 For example `check_snmp.py -r 192.168.1.120`
 
-By default SNMPv2c and community string public will be used. Different values can be specified with `-v` and `-c` respectively.
+By default SNMP version **v2c** and community string **public** will be used. Different values can be specified with `-v` and `-c` respectively.
 The script will decide the manufacturer based on the OID returned on a initial call to snmpgetnext.
 
 The mibs folder contains lots of MIB files downloaded from Dell and HPE websites, also the ones downloaded by `snmp-mibs-downloader`.
