@@ -159,11 +159,8 @@ for oid in Config[Vendor]['oids']:
                                                   status=result_status['color'].format(result_status['status']),
                                                   formatted=cs.formatted))
 
-# what if there is no important in Config?
 if RespectImp and exitCodeImp > -1:
     sys.exit(exitCodeImp)
 else:
     sys.exit(exitCode)
-
-# print_and_exit('Query completed.', exitCode)
 
