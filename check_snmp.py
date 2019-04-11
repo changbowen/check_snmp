@@ -89,7 +89,7 @@ Config = {
                 ],
             }),
             ('powerSupply', {
-                'description': 'Power supply Status',
+                'description': 'Power Supply Status',
                 'oids': [
                     {'oid': 'powerSupplyLocationName', 'type': 'text'},
                     {'oid': 'powerSupplyStatus', 'type': 'status'},
@@ -153,7 +153,7 @@ Config = {
                 ],
             }),
             ('powerSupply', {
-                'description': 'Power supply Status',
+                'description': 'Power Supply Status',
                 'oids': [
                     {'oid': 'cpqHeFltTolPowerSupplyCondition', 'type': 'status'},
                 ],
