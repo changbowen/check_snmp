@@ -1,9 +1,21 @@
 ## check_snmp
 #### Python script that checks components status against Dell or HPE servers with snmpwalk command
 
-Usage: `check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] host`
+```
+usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f] host
 
-For example `check_snmp.py -r 192.168.1.120`
+positional arguments:
+  host          The host to connect to.
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -v VERSION    The SNMP version to use.
+  -c COMMUNITY  The community string to use.
+  -r            Respect properties marked as important when other results contain errors.
+  -f            Include additional format like colors in the output.
+```
+
+For example `check_snmp.py -r -f 192.168.1.120`
 
 By default SNMP version **v2c** and community string **public** will be used. Different values can be specified with `-v` and `-c` respectively.
 The script will decide the manufacturer based on the OID returned on a initial call to snmpgetnext.
@@ -18,19 +30,7 @@ As one of my earliest Python projects, feel free to fork and make your own impro
 --------------
 
 ### Sample Output
-```
-sample@sample:~$ ./check_snmp.py -r 192.168.1.120
-Overall system status: critical (critical)
-Processor status: ok (ok)
-Memory status: ok (ok|ok)
-Physical disk status: critical (online|online|removed|removed|removed|failed|online)
-Virtual disk status: critical (degraded)
-Storage controller status: ok (ok|ok)
-Cooling status: ok (ok)
-Temperature status: ok (ok|ok)
-Power supply status: ok (ok)
-Battery status: ok (ok)
-```
+![sample](https://i.imgur.com/QowbHdr.png)
 
 ### Return Value
 Integer value that is inline with the Nagios exit codes.
