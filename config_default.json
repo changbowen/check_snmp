@@ -1,0 +1,276 @@
+{
+  "dell": {
+    "mib_dir": "mibs/default:mibs/iana:mibs/ietf:mibs/dell",
+    "mib": "IDRAC-MIB-SMIv2",
+    "categories": {
+      "global": {
+        "description": "Overall System Status",
+        "oids": [
+          {
+            "oid": "systemModelName",
+            "type": "text"
+          },
+          {
+            "oid": "systemServiceTag",
+            "type": "text"
+          },
+          {
+            "oid": "globalSystemStatus",
+            "type": "status"
+          }
+        ],
+        "important": true
+      },
+      "processor": {
+        "description": "Processor Status",
+        "oids": [
+          {
+            "oid": "processorDeviceBrandName",
+            "type": "text"
+          },
+          {
+            "oid": "processorDeviceStatus",
+            "type": "status"
+          }
+        ]
+      },
+      "memory": {
+        "description": "Memory Status",
+        "oids": [
+          {
+            "oid": "memoryDeviceLocationName",
+            "type": "text"
+          },
+          {
+            "oid": "memoryDeviceStatus",
+            "type": "status"
+          }
+        ]
+      },
+      "physicalDisk": {
+        "description": "Physical Disk Status",
+        "oids": [
+          {
+            "oid": "physicalDiskDisplayName",
+            "type": "text"
+          },
+          {
+            "oid": "physicalDiskState",
+            "type": "status"
+          }
+        ]
+      },
+      "virtualDisk": {
+        "description": "Virtual Disk Status",
+        "oids": [
+          {
+            "oid": "virtualDiskDisplayName",
+            "type": "text"
+          },
+          {
+            "oid": "virtualDiskState",
+            "type": "status"
+          }
+        ]
+      },
+      "storageController": {
+        "description": "Storage Controller Status",
+        "oids": [
+          {
+            "oid": "controllerName",
+            "type": "text"
+          },
+          {
+            "oid": "controllerComponentStatus",
+            "type": "status"
+          }
+        ]
+      },
+      "cooling": {
+        "description": "Cooling Status",
+        "oids": [
+          {
+            "oid": "coolingUnitName",
+            "type": "text"
+          },
+          {
+            "oid": "coolingUnitStatus",
+            "type": "status"
+          }
+        ]
+      },
+      "temperature": {
+        "description": "Temperature Status",
+        "oids": [
+          {
+            "oid": "temperatureProbeLocationName",
+            "type": "text"
+          },
+          {
+            "oid": "temperatureProbeStatus",
+            "type": "status"
+          }
+        ]
+      },
+      "powerSupply": {
+        "description": "Power Supply Status",
+        "oids": [
+          {
+            "oid": "powerSupplyLocationName",
+            "type": "text"
+          },
+          {
+            "oid": "powerSupplyStatus",
+            "type": "status"
+          }
+        ]
+      },
+      "battery": {
+        "description": "Battery Status",
+        "oids": [
+          {
+            "oid": "systemBatteryLocationName",
+            "type": "text"
+          },
+          {
+            "oid": "systemBatteryStatus",
+            "type": "status"
+          }
+        ]
+      }
+    }
+  },
+  "hpe": {
+    "mib_dir": "mibs/default:mibs/iana:mibs/ietf:mibs/hpe",
+    "mib": "CPQSINFO-MIB:CPQHLTH-MIB:CPQIDA-MIB:CPQSTDEQ-MIB",
+    "categories": {
+      "global": {
+        "description": "Overall System Status",
+        "oids": [
+          {
+            "oid": "cpqSiProductName",
+            "type": "text"
+          },
+          {
+            "oid": "cpqSiSysSerialNum",
+            "type": "text"
+          },
+          {
+            "oid": "cpqHeMibCondition",
+            "type": "status"
+          }
+        ],
+        "important": true
+      },
+      "processor": {
+        "description": "Processor Status",
+        "oids": [
+          {
+            "oid": "cpqSeCpuName",
+            "type": "text"
+          },
+          {
+            "oid": "cpqSeCpuStatus",
+            "type": "status"
+          }
+        ]
+      },
+      "memory": {
+        "description": "Memory Status",
+        "oids": [
+          {
+            "oid": "cpqHeResMem2ModuleHwLocation",
+            "type": "text"
+          },
+          {
+            "oid": "cpqHeResMem2ModuleCondition",
+            "type": "status"
+          }
+        ]
+      },
+      "physicalDisk": {
+        "description": "Physical Disk Status",
+        "oids": [
+          {
+            "oid": "cpqDaPhyDrvLocationString",
+            "type": "text"
+          },
+          {
+            "oid": "cpqDaPhyDrvCondition",
+            "type": "status"
+          }
+        ]
+      },
+      "virtualDisk": {
+        "description": "Virtual Disk Status",
+        "oids": [
+          {
+            "oid": "cpqDaLogDrvCondition",
+            "type": "status"
+          }
+        ]
+      },
+      "storageController": {
+        "description": "Storage Controller Status",
+        "oids": [
+          {
+            "oid": "cpqDaCntlrModel",
+            "type": "text"
+          },
+          {
+            "oid": "cpqDaCntlrCondition",
+            "type": "status"
+          }
+        ]
+      },
+      "cooling": {
+        "description": "Cooling Status",
+        "oids": [
+          {
+            "oid": "cpqHeFltTolFanLocale",
+            "type": "text"
+          },
+          {
+            "oid": "cpqHeFltTolFanCondition",
+            "type": "status"
+          }
+        ]
+      },
+      "temperature": {
+        "description": "Temperature Status",
+        "oids": [
+          {
+            "oid": "cpqHeTemperatureLocale",
+            "type": "text"
+          },
+          {
+            "oid": "cpqHeTemperatureCondition",
+            "type": "status"
+          }
+        ]
+      },
+      "powerSupply": {
+        "description": "Power Supply Status",
+        "oids": [
+          {
+            "oid": "cpqHeFltTolPowerSupplyModel",
+            "type": "text"
+          },
+          {
+            "oid": "cpqHeFltTolPowerSupplyCondition",
+            "type": "status"
+          }
+        ]
+      },
+      "eventLog": {
+        "description": "Integrated Management Log Status",
+        "oids": [
+          {
+            "oid": "cpqHeEventLogCondition",
+            "type": "status"
+          }
+        ]
+      }
+    }
+  }
+}

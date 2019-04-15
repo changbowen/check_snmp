@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 import argparse
+import json
 from collections import OrderedDict
 from typing import NamedTuple
 
@@ -13,8 +14,12 @@ _parser.add_argument('-c', dest='community', help='The community string to use.'
 _parser.add_argument('-r', dest='respect', help='Respect properties marked as important when other results contain errors.', action='store_true')
 _parser.add_argument('-f', dest='more_format', help='Include additional format like colors in the output.', action='store_true')
 _parser.add_argument('host', help='The host to connect to.')
+_parser.add_argument('config', nargs='?', help='The configuration file to load.')
+_parser.add_argument('category', nargs='*', help='One or more of the categories from the configuration separated by spaces.')
 _args = _parser.parse_args()
 args_Host = _args.host
+args_Config = _args.config
+args_Category = _args.category  # type: list
 args_Version = _args.version
 args_Community = _args.community
 args_RespectImp = _args.respect
@@ -24,149 +29,166 @@ args_MoreFormat = _args.more_format
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 # definitions
-Config = {
-    'dell': {
-        'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/dell',
-        'mib': 'IDRAC-MIB-SMIv2',
-        'categories': OrderedDict([
-            ('global', {
-                'description': 'Overall System Status',
-                'oids': [
-                    {'oid': 'systemModelName', 'type': 'text'},
-                    {'oid': 'systemServiceTag', 'type': 'text'},
-                    {'oid': 'systemOSName', 'type': 'text'},
-                    {'oid': 'globalSystemStatus', 'type': 'status'},
-                ],
-                'important': True
-            }),
-            ('processor', {
-                'description': 'Processor Status',
-                'oids': [
-                    {'oid': 'processorDeviceBrandName', 'type': 'text'},
-                    {'oid': 'processorDeviceStatus', 'type': 'status'},
-                ],
-            }),
-            ('memory', {
-                'description': 'Memory Status',
-                'oids': [
-                    {'oid': 'memoryDeviceLocationName', 'type': 'text'},
-                    {'oid': 'memoryDeviceStatus', 'type': 'status'},
-                ],
-            }),
-            ('physicalDisk', {
-                'description': 'Physical Disk Status',
-                'oids': [
-                    {'oid': 'physicalDiskDisplayName', 'type': 'text'},
-                    {'oid': 'physicalDiskState', 'type': 'status'},
-                ],
-            }),
-            ('virtualDisk', {
-                'description': 'Virtual Disk Status',
-                'oids': [
-                    {'oid': 'virtualDiskDisplayName', 'type': 'text'},
-                    {'oid': 'virtualDiskState', 'type': 'status'},
-                ],
-            }),
-            ('storageController', {
-                'description': 'Storage Controller Status',
-                'oids': [
-                    {'oid': 'controllerName', 'type': 'text'},
-                    {'oid': 'controllerComponentStatus', 'type': 'status'},
-                ],
-            }),
-            ('cooling', {
-                'description': 'Cooling Status',
-                'oids': [
-                    {'oid': 'coolingUnitName', 'type': 'text'},
-                    {'oid': 'coolingUnitStatus', 'type': 'status'},
-                ],
-            }),
-            ('temperature', {
-                'description': 'Temperature Status',
-                'oids': [
-                    {'oid': 'temperatureProbeLocationName', 'type': 'text'},
-                    {'oid': 'temperatureProbeStatus', 'type': 'status'},
-                ],
-            }),
-            ('powerSupply', {
-                'description': 'Power Supply Status',
-                'oids': [
-                    {'oid': 'powerSupplyLocationName', 'type': 'text'},
-                    {'oid': 'powerSupplyStatus', 'type': 'status'},
-                ],
-            }),
-            ('battery', {
-                'description': 'Battery Status',
-                'oids': [
-                    {'oid': 'systemBatteryLocationName', 'type': 'text'},
-                    {'oid': 'systemBatteryStatus', 'type': 'status'},
-                ],
-            }),
-        ])
-    },
-    'hpe': {
-        'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/hpe',
-        'mib': 'CPQSINFO-MIB:CPQHLTH-MIB:CPQIDA-MIB',
-        'categories': OrderedDict([
-            ('global', {
-                'description': 'Overall System Status',
-                'oids': [
-                    {'oid': 'cpqHeMibCondition', 'type': 'status'},
-                ],
-                'important': True
-            }),
-            ('memory', {
-                'description': 'Memory Status',
-                'oids': [
-                    {'oid': 'cpqHeResilientMemCondition', 'type': 'status'},
-                ],
-            }),
-            ('physicalDisk', {
-                'description': 'Physical Disk Status',
-                'oids': [
-                    {'oid': 'cpqDaPhyDrvLocationString', 'type': 'text'},
-                    {'oid': 'cpqDaPhyDrvCondition', 'type': 'status'},
-                ],
-            }),
-            ('virtualDisk', {
-                'description': 'Virtual Disk Status',
-                'oids': [
-                    {'oid': 'cpqDaMibCondition', 'type': 'status'},
-                ],
-            }),
-            ('storageController', {
-                'description': 'Storage Controller Status',
-                'oids': [
-                    {'oid': 'cpqDaCntlrCondition', 'type': 'status'},
-                ],
-            }),
-            ('cooling', {
-                'description': 'Cooling Status',
-                'oids': [
-                    {'oid': 'cpqHeThermalSystemFanStatus', 'type': 'status'},
-                ],
-            }),
-            ('temperature', {
-                'description': 'Temperature Status',
-                'oids': [
-                    {'oid': 'cpqHeThermalTempStatus', 'type': 'status'},
-                ],
-            }),
-            ('powerSupply', {
-                'description': 'Power Supply Status',
-                'oids': [
-                    {'oid': 'cpqHeFltTolPowerSupplyCondition', 'type': 'status'},
-                ],
-            }),
-            ('battery', {
-                'description': 'Integrated Management Log Status',
-                'oids': [
-                    {'oid': 'cpqHeEventLogCondition', 'type': 'status'},
-                ],
-            }),
-        ]),
+if args_Config:
+    with open(args_Config, 'r') as config_file:
+        Config = json.load(config_file, object_pairs_hook=OrderedDict)
+else:
+    Config = {
+        'dell': {
+            'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/dell',
+            'mib': 'IDRAC-MIB-SMIv2',
+            'categories': OrderedDict([
+                ('global', {
+                    'description': 'Overall System Status',
+                    'oids': [
+                        {'oid': 'systemModelName', 'type': 'text'},
+                        {'oid': 'systemServiceTag', 'type': 'text'},
+                        {'oid': 'globalSystemStatus', 'type': 'status'},
+                    ],
+                    'important': True
+                }),
+                ('processor', {
+                    'description': 'Processor Status',
+                    'oids': [
+                        {'oid': 'processorDeviceBrandName', 'type': 'text'},
+                        {'oid': 'processorDeviceStatus', 'type': 'status'},
+                    ],
+                }),
+                ('memory', {
+                    'description': 'Memory Status',
+                    'oids': [
+                        {'oid': 'memoryDeviceLocationName', 'type': 'text'},
+                        {'oid': 'memoryDeviceStatus', 'type': 'status'},
+                    ],
+                }),
+                ('physicalDisk', {
+                    'description': 'Physical Disk Status',
+                    'oids': [
+                        {'oid': 'physicalDiskDisplayName', 'type': 'text'},
+                        {'oid': 'physicalDiskState', 'type': 'status'},
+                    ],
+                }),
+                ('virtualDisk', {
+                    'description': 'Virtual Disk Status',
+                    'oids': [
+                        {'oid': 'virtualDiskDisplayName', 'type': 'text'},
+                        {'oid': 'virtualDiskState', 'type': 'status'},
+                    ],
+                }),
+                ('storageController', {
+                    'description': 'Storage Controller Status',
+                    'oids': [
+                        {'oid': 'controllerName', 'type': 'text'},
+                        {'oid': 'controllerComponentStatus', 'type': 'status'},
+                    ],
+                }),
+                ('cooling', {
+                    'description': 'Cooling Status',
+                    'oids': [
+                        {'oid': 'coolingUnitName', 'type': 'text'},
+                        {'oid': 'coolingUnitStatus', 'type': 'status'},
+                    ],
+                }),
+                ('temperature', {
+                    'description': 'Temperature Status',
+                    'oids': [
+                        {'oid': 'temperatureProbeLocationName', 'type': 'text'},
+                        {'oid': 'temperatureProbeStatus', 'type': 'status'},
+                    ],
+                }),
+                ('powerSupply', {
+                    'description': 'Power Supply Status',
+                    'oids': [
+                        {'oid': 'powerSupplyLocationName', 'type': 'text'},
+                        {'oid': 'powerSupplyStatus', 'type': 'status'},
+                    ],
+                }),
+                ('battery', {
+                    'description': 'Battery Status',
+                    'oids': [
+                        {'oid': 'systemBatteryLocationName', 'type': 'text'},
+                        {'oid': 'systemBatteryStatus', 'type': 'status'},
+                    ],
+                }),
+            ])
+        },
+        'hpe': {
+            'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/hpe',
+            'mib': 'CPQSINFO-MIB:CPQHLTH-MIB:CPQIDA-MIB:CPQSTDEQ-MIB',
+            'categories': OrderedDict([
+                ('global', {
+                    'description': 'Overall System Status',
+                    'oids': [
+                        {'oid': 'cpqSiProductName', 'type': 'text'},
+                        {'oid': 'cpqSiSysSerialNum', 'type': 'text'},
+                        {'oid': 'cpqHeMibCondition', 'type': 'status'},
+                    ],
+                    'important': True
+                }),
+                ('processor', {
+                    'description': 'Processor Status',
+                    'oids': [
+                        {'oid': 'cpqSeCpuName', 'type': 'text'},
+                        {'oid': 'cpqSeCpuStatus', 'type': 'status'},
+                    ],
+                }),
+                ('memory', {
+                    'description': 'Memory Status',
+                    'oids': [
+                        {'oid': 'cpqHeResMem2ModuleHwLocation', 'type': 'text'},
+                        {'oid': 'cpqHeResMem2ModuleCondition', 'type': 'status'},
+                    ],
+                }),
+                ('physicalDisk', {
+                    'description': 'Physical Disk Status',
+                    'oids': [
+                        {'oid': 'cpqDaPhyDrvLocationString', 'type': 'text'},
+                        {'oid': 'cpqDaPhyDrvCondition', 'type': 'status'},
+                    ],
+                }),
+                ('virtualDisk', {
+                    'description': 'Virtual Disk Status',
+                    'oids': [
+                        {'oid': 'cpqDaLogDrvCondition', 'type': 'status'},
+                    ],
+                }),
+                ('storageController', {
+                    'description': 'Storage Controller Status',
+                    'oids': [
+                        {'oid': 'cpqDaCntlrModel', 'type': 'text'},
+                        {'oid': 'cpqDaCntlrCondition', 'type': 'status'},
+                    ],
+                }),
+                ('cooling', {
+                    'description': 'Cooling Status',
+                    'oids': [
+                        {'oid': 'cpqHeFltTolFanLocale', 'type': 'text'},
+                        {'oid': 'cpqHeFltTolFanCondition', 'type': 'status'},
+                    ],
+                }),
+                ('temperature', {
+                    'description': 'Temperature Status',
+                    'oids': [
+                        {'oid': 'cpqHeTemperatureLocale', 'type': 'text'},
+                        {'oid': 'cpqHeTemperatureCondition', 'type': 'status'},
+                    ],
+                }),
+                ('powerSupply', {
+                    'description': 'Power Supply Status',
+                    'oids': [
+                        {'oid': 'cpqHeFltTolPowerSupplyModel', 'type': 'text'},
+                        {'oid': 'cpqHeFltTolPowerSupplyCondition', 'type': 'status'},
+                    ],
+                }),
+                ('eventLog', {
+                    'description': 'Integrated Management Log Status',
+                    'oids': [
+                        {'oid': 'cpqHeEventLogCondition', 'type': 'status'},
+                    ],
+                }),
+            ]),
+        }
     }
-}
 StatusOK = ('ok', 'true', 'yes', 'on', 'online', 'spunup', 'full', 'ready', 'enabled', 'presence', 'non-raid', 'nonraid', '0')
 StatusWarning = ('noncritical', 'removed', 'foreign', 'offline')
 StatusCritical = ('fail', 'failed', 'critical', 'nonrecoverable', 'notredundant', 'lost', 'degraded', 'redundancyoffline')
@@ -284,6 +306,9 @@ vendor = Config[Vendor]
 mib_dir = vendor['mib_dir']
 mib = vendor['mib']
 for category_key in vendor['categories']:
+    # only show specified categories when applicable
+    if len(args_Category) > 0 and category_key not in args_Category: continue
+
     category = vendor['categories'][category_key]
     description = category['description']
     imp = category.get('important') is True

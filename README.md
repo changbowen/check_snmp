@@ -2,10 +2,13 @@
 #### Python script that checks components status against Dell or HPE servers with snmpwalk command
 
 ```
-usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f] host
+usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f]
+                     host [config] [category [category ...]]
 
 positional arguments:
   host          The host to connect to.
+  config        The configuration file to load.
+  category      One or more of the categories from the configuration separated by spaces.
 
 optional arguments:
   -h, --help    show this help message and exit
@@ -78,34 +81,59 @@ OID (numeric format) | OID Translation | Description
 1.3.6.1.4.1.674.10892.5.4.200.10.1.58 | systemStateIDSDMCardUnitStatusCombined
 1.3.6.1.4.1.674.10892.5.4.200.10.1.60 | systemStateIDSDMCardDeviceStatusCombined
 1.3.6.1.4.1.674.10892.5.4.200.10.1.63 | systemStateTemperatureStatisticsStatusCombined
-1.3.6.1.4.1.674.10892.5.4.300.40.1.7.1 | eventLogSeverityStatus
-1.3.6.1.4.1.674.10892.5.2.1 | globalSystemStatus | Overall system status
-1.3.6.1.4.1.674.10892.5.4.1100.50.1.5 | memoryDeviceStatus | Memory status
-1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.4 | physicalDiskState | Physical disk status
-1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38 | controllerComponentStatus | Storage controller status
-1.3.6.1.4.1.674.10892.5.4.700.10.1.8 | coolingUnitStatus | Cooling status
-1.3.6.1.4.1.674.10892.5.4.700.20.1.5 | temperatureProbeStatus | Temperature status
-1.3.6.1.4.1.674.10892.5.4.600.12.1.5 | powerSupplyStatus | Power supply status
+1.3.6.1.4.1.674.10892.5.4.300.40.1.7 | eventLogSeverityStatus
+1.3.6.1.4.1.674.10892.5.1.3.12 | systemModelName
+1.3.6.1.4.1.674.10892.5.1.3.2 | systemServiceTag
+1.3.6.1.4.1.674.10892.5.2.1 | globalSystemStatus
+1.3.6.1.4.1.674.10892.5.4.1100.30.1.23 | processorDeviceBrandName
+1.3.6.1.4.1.674.10892.5.4.1100.30.1.5 | processorDeviceStatus
+1.3.6.1.4.1.674.10892.5.4.1100.50.1.8 | memoryDeviceLocationName
+1.3.6.1.4.1.674.10892.5.4.1100.50.1.5 | memoryDeviceStatus
+1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.55 | physicalDiskDisplayName
+1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.4 | physicalDiskState
+1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.36 | virtualDiskDisplayName
+1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4 | virtualDiskState
+1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2 | controllerName
+1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38 | controllerComponentStatus
+1.3.6.1.4.1.674.10892.5.4.700.10.1.7 | coolingUnitName
+1.3.6.1.4.1.674.10892.5.4.700.10.1.8 | coolingUnitStatus
+1.3.6.1.4.1.674.10892.5.4.700.20.1.8 | temperatureProbeLocationName
+1.3.6.1.4.1.674.10892.5.4.700.20.1.5 | temperatureProbeStatus
+1.3.6.1.4.1.674.10892.5.4.600.12.1.8 | powerSupplyLocationName
+1.3.6.1.4.1.674.10892.5.4.600.12.1.5 | powerSupplyStatus
+1.3.6.1.4.1.674.10892.5.4.600.50.1.7 | systemBatteryLocationName
+1.3.6.1.4.1.674.10892.5.4.600.50.1.5 | systemBatteryStatus
 
 #### HPE
-HPE OIDs are much harder to collect since they are scattered into multiple MIBs and there are few clear support documents online.
+HPE OIDs are much harder to collect since they are scattered into multiple MIBs and there are fewer clear support documents online.
 
 OID (numeric format) | OID Translation | Description
 ---| --- | ---
 1.3.6.1.4.1.232.6.1.3.0 | cpqHeMibCondition | Overall system condition
-1.3.6.1.4.1.232.6.2.6.5.0 | cpqHeThermalCpuFanStatus | CPU fan condition
-1.3.6.1.4.1.232.6.2.6.4.0 | cpqHeThermalSystemFanStatus | System fan condition
 1.3.6.1.4.1.232.3.1.3.0 | cpqDaMibCondition | Disk array condition
-1.3.6.1.4.1.232.3.2.2.1.1.6.0 | cpqDaCntlrCondition | Disk controller condition
-1.3.6.1.4.1.232.3.2.2.2.1.9.0 | cpqDaAccelCondition | Disk accelerator condition 
-1.3.6.1.4.1.232.6.2.9.3.1.4.0 | cpqHeFltTolPowerSupplyCondition | Power supply condition
-1.3.6.1.4.1.232.6.2.6.3.0 | cpqHeThermalTempStatus | Temperature condition
-1.3.6.1.4.1.232.6.2.6.1.0 | cpqHeThermalCondition | Thermal condition
 1.3.6.1.4.1.232.6.2.11.2.0 | cpqHeEventLogCondition | Integrated Management Log condition
 1.3.6.1.4.1.232.18.1.3.0 | cpqNicMibCondition | NIC condition
-1.3.6.1.4.1.232.1.1.3.0 | cpqSeMibCondition | CPU?
 1.3.6.1.4.1.232.9.1.3.0 | cpqSm2MibCondition | iLO condition
 1.3.6.1.4.1.232.2.1.3.0 | cpqSiMibCondition | System information condition
+1.3.6.1.4.1.232.2.2.4.2 | cpqSiProductName | Model
+1.3.6.1.4.1.232.2.2.2.1 | cpqSiSysSerialNum | Serial number
+1.3.6.1.4.1.232.6.1.3.0 | cpqHeMibCondition | Overall health condition
+1.3.6.1.4.1.232.1.2.2.1.1.3 | cpqSeCpuName | CPU Model
+1.3.6.1.4.1.232.1.2.2.1.1.6 | cpqSeCpuStatus | CPU status
+1.3.6.1.4.1.232.6.2.14.13.1.13 | cpqHeResMem2ModuleHwLocation | Memory location
+1.3.6.1.4.1.232.6.2.14.13.1.20 | cpqHeResMem2ModuleCondition | Memory condition
+1.3.6.1.4.1.232.3.2.5.1.1.64 | cpqDaPhyDrvLocationString | Physical disk location
+1.3.6.1.4.1.232.3.2.5.1.1.37 | cpqDaPhyDrvCondition | Physical disk condition
+1.3.6.1.4.1.232.3.2.3.1.1.11 | cpqDaLogDrvCondition | Virtual disk condition
+1.3.6.1.4.1.232.3.2.2.1.1.2 | cpqDaCntlrModel | Storage controller model
+1.3.6.1.4.1.232.3.2.2.1.1.6.0 | cpqDaCntlrCondition | Storage controller condition
+1.3.6.1.4.1.232.3.2.2.2.1.9.0 | cpqDaAccelCondition | Disk accelerator condition 
+1.3.6.1.4.1.232.6.2.6.7.1.3 | cpqHeFltTolFanLocale | Fan location
+1.3.6.1.4.1.232.6.2.6.7.1.9 | cpqHeFltTolFanCondition | Fan condition
+1.3.6.1.4.1.232.6.2.6.8.1.3 | cpqHeTemperatureLocale | Temperature probe location
+1.3.6.1.4.1.232.6.2.6.8.1.6 | cpqHeTemperatureCondition | Temperature condition
+1.3.6.1.4.1.232.6.2.9.3.1.10 | cpqHeFltTolPowerSupplyModel | Power supply model
+1.3.6.1.4.1.232.6.2.9.3.1.4.0 | cpqHeFltTolPowerSupplyCondition | Power supply condition
 
 ### Links
 [OID repository - HPE root (Compaq)](http://www.oid-info.com/get/1.3.6.1.4.1.232)

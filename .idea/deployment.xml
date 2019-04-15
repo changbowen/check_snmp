@@ -5,7 +5,7 @@
       <paths name="WebSrvTest">
         <serverdata>
           <mappings>
-            <mapping deploy="/check_snmp" local="$PROJECT_DIR$" web="/check_snmp" />
+            <mapping deploy="/opt/check_snmp" local="$PROJECT_DIR$" web="/check_snmp" />
           </mappings>
         </serverdata>
       </paths>
