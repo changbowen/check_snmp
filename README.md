@@ -23,8 +23,8 @@ For example `check_snmp.py -r -f 192.168.1.120`
 By default SNMP version **v2c** and community string **public** will be used. Different values can be specified with `-v` and `-c` respectively.
 The script will decide the manufacturer based on the OID returned on a initial call to snmpgetnext.
 
-The script will load configurations from file `config_default.json` in the same directory by default.
-If you won't specify another config file, keep the default one in the same directory as the script.
+The script will load configurations from file `config_default.json` in the same directory by default. It is possible to pass a custom config file with the correct format to tune the output as you wish.
+**If you won't specify another config file, keep the default one in the same directory as the script.**
 
 The mibs folder contains lots of MIB files downloaded from Dell and HPE websites, also the ones downloaded by `snmp-mibs-downloader`.
 Only a few are used by the script. The rest are kept for completeness. Also they are no so big.
