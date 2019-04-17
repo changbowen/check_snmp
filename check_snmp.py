@@ -9,12 +9,12 @@ from collections import OrderedDict
 from typing import NamedTuple
 
 _parser = argparse.ArgumentParser()
-_parser.add_argument('-v', dest='version', help='The SNMP version to use.', default='2c')
-_parser.add_argument('-c', dest='community', help='The community string to use.', default='public')
-_parser.add_argument('-r', dest='respect', help='Respect properties marked as important when other results contain errors.', action='store_true')
-_parser.add_argument('-f', dest='more_format', help='Include additional format like colors in the output.', action='store_true')
+_parser.add_argument('-v', '--version', dest='version', help='The SNMP version to use.', default='2c')
+_parser.add_argument('-c', '--community', dest='community', help='The community string to use.', default='public')
+_parser.add_argument('-r', '--respect', dest='respect', help='Respect properties marked as important when other results contain errors.', action='store_true')
+_parser.add_argument('-f', '--format', dest='more_format', help='Include additional format like colors in the output.', action='store_true')
 _parser.add_argument('host', help='The host to connect to.')
-_parser.add_argument('config', nargs='?', help='The configuration file to load.', default='config_default.json')
+_parser.add_argument('--config', nargs='?', help='The configuration file to load.', default='config_default.json')
 _parser.add_argument('category', nargs='*', help='One or more of the categories from the configuration separated by spaces.')
 _args = _parser.parse_args()
 args_Host = _args.host

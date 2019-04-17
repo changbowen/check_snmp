@@ -2,20 +2,22 @@
 #### Python script that checks components status against Dell or HPE servers with snmpwalk command
 
 ```
-usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f]
-                     host [config] [category [category ...]]
+usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f] [--config [CONFIG]]
+                     host [category [category ...]]
 
 positional arguments:
-  host          The host to connect to.
-  config        The configuration file to load.
-  category      One or more of the categories from the configuration separated by spaces.
+  host                  The host to connect to.
+  category              One or more of the categories from the configuration separated by spaces.
 
 optional arguments:
-  -h, --help    show this help message and exit
-  -v VERSION    The SNMP version to use.
-  -c COMMUNITY  The community string to use.
-  -r            Respect properties marked as important when other results contain errors.
-  -f            Include additional format like colors in the output.
+  -h, --help            show this help message and exit
+  -v VERSION, --version VERSION
+                        The SNMP version to use.
+  -c COMMUNITY, --community COMMUNITY
+                        The community string to use.
+  -r, --respect         Respect properties marked as important when other results contain errors.
+  -f, --format          Include additional format like colors in the output.
+  --config [CONFIG]     The configuration file to load.
 ```
 
 For example `check_snmp.py -r -f 192.168.1.120`
@@ -31,6 +33,9 @@ Only a few are used by the script. The rest are kept for completeness. Also they
 **Keep the folder at the same directory with the script so the MIB files can be loaded correctly.**
 
 The script is developed and tested on Python 3.5 against a few Dell PowerEdge servers (iDRAC 9) and HPE ProLiant DL380 Gen9 (iLO 4).
+
+And of course you need to have snmp installed with `sudo apt install snmp`.
+
 As one of my earliest Python projects, feel free to fork and make your own improvements.
 
 --------------
