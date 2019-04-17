@@ -43,6 +43,8 @@ As one of my earliest Python projects, feel free to fork and make your own impro
 ### Sample Output
 ![sample](https://i.imgur.com/QowbHdr.png)
 
+To be used as a nagios plugin, do not specify the `-f` option so that the output is not embedded with the ANSI color codes. If the renderer does not support parsing the color codes, it will pollute the output.
+
 ### Return Value
 Integer value that is inline with the Nagios exit codes.
 
