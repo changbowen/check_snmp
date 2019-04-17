@@ -1,5 +1,5 @@
-## check_snmp
-#### Python script that checks components status against Dell or HPE servers with snmpwalk command
+# check_snmp
+## Python script / nagios plug-in that checks components status of Dell or HP servers with snmpwalk command
 
 ```
 usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f] [--config [CONFIG]]
