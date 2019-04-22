@@ -210,7 +210,7 @@ for category_key in vendor['categories']:
                 
         category_output = category_output.format(combined_status=status_formatter(category_code, with_color=args_MoreFormat))
     
-    print(category_output)
+    sys.stdout.write(category_output)
 
     if imp: exitCodeImp = update_status_code(exitCodeImp, category_code)
     exitCode = update_status_code(exitCode, category_code)
