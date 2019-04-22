@@ -191,8 +191,8 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 with open(args_Config, 'r') as config_file:
     Config = json.load(config_file, object_pairs_hook=OrderedDict)
 
-StatusOK = ('ok', 'true', 'yes', 'on', 'online', 'spunup', 'full', 'ready', 'enabled', 'presence', 'non-raid', 'nonraid', '0')
-StatusWarning = ('noncritical', 'removed', 'foreign', 'offline')
+StatusOK = ('ok', 'true', 'yes', 'on', 'online', 'spunup', 'full', 'ready', 'enabled', 'presence', 'non-raid', 'nonraid', '0', 'notapplicable')
+StatusWarning = ('noncritical', 'removed', 'foreign', 'offline', 'rebuild')
 StatusCritical = ('fail', 'failed', 'critical', 'nonrecoverable', 'notredundant', 'lost', 'degraded', 'redundancyoffline')
 StatusMap = {
     0: {'status': 'OK',         'color': '\033[32m{}\033[00m',  'severity': 0},  # green
@@ -279,14 +279,17 @@ def status_formatter(status: int, alt_text: str = None, with_color: bool = True)
     return result
 
 
-def get_row_output(col_val_raw: str, col_type: str) -> str:
+def get_row_output(col_val_raw: str, col_type: str, col_prefix: str = None, col_suffix: str = None) -> str:
+    if col_prefix is None: col_prefix = ''
+    if col_suffix is None: col_suffix = ''
     if col_type == 'status':
         col_val = status_converter(col_val_raw)
         global category_code
         category_code = update_status_code(category_code, col_val)
-        return status_formatter(col_val, StatusMap[col_val]['status'] + ' (' + col_val_raw + ')', args_MoreFormat)
+        result = status_formatter(col_val, StatusMap[col_val]['status'] + ' (' + col_val_raw + ')', args_MoreFormat)
     else:
-        return col_val_raw
+        result = col_val_raw
+    return col_prefix + result + col_suffix
 
 
 # execution
@@ -303,10 +306,13 @@ else:
     print_and_exit('Unknown vendor information.', 3)
 
 
+global_list_bullet = Config['config']['global-list-bullet']
+global_oid_separator = Config['config']['global-oid-separator']
 exitCode, exitCodeImp = -1, -1
 vendor = Config[Vendor]
 mib_dir = vendor['mib_dir']
 mib = vendor['mib']
+
 for category_key in vendor['categories']:
     # only show specified categories when applicable
     if len(args_Category) > 0 and category_key not in args_Category: continue
@@ -314,6 +320,11 @@ for category_key in vendor['categories']:
     category = vendor['categories'][category_key]
     description = category['description']
     imp = category.get('important') is True
+
+    list_bullet = category.get('list-bullet')
+    if list_bullet is None: list_bullet = global_list_bullet
+    oid_separator = category.get('oid-separator')
+    if oid_separator is None: oid_separator = global_oid_separator
 
     oids = category['oids']
     if len(oids) == 0: continue
@@ -325,20 +336,29 @@ for category_key in vendor['categories']:
     for oid in oids:
         oid_result_raw = run(SnmpCommand('snmpwalk', args_Host, oid['oid'], mib_dir, mib, True))
         if len(oid_result_raw.stderr) > 0: print_and_exit(oid_result_raw.stderr, 3)
-        category_result_raw.append([(l.strip('" \n'), oid['type']) for l in oid_result_raw.stdout.splitlines()])
+        category_result_raw.append([(l.strip('" \n'),
+                                     oid['type'],
+                                     oid.get('prefix'),
+                                     oid.get('suffix')) for l in oid_result_raw.stdout.splitlines()])
     category_result_raw = [i for i in zip(*category_result_raw)]  # swap axis
 
     if len(category_result_raw) == 1 and len(category_result_raw[0]) == 1:  # there is only one status item without anything else
         col = category_result_raw[0][0]
-        category_output = category_output.format(combined_status=get_row_output(col[0], col[1]))
+        category_output = category_output.format(combined_status=get_row_output(col[0],
+                                                                                col[1],
+                                                                                col[2],
+                                                                                col[3]))
 
     else:
         for row in category_result_raw:  # row is like (('DIMM.Socket.A1', 'text'), ('failed', 'status'))
             cols = []
             for col in row:  # col is like ('DIMM.Socket.A1', 'text')
-                cols.append(get_row_output(col[0], col[1]))
+                cols.append(get_row_output(col[0],
+                                           col[1],
+                                           col[2],
+                                           col[3]))
 
-            category_output += '  - ' + ', '.join(cols) + '\n'
+            category_output += list_bullet + oid_separator.join(cols) + '\n'
         category_output = category_output.format(combined_status=status_formatter(category_code, with_color=args_MoreFormat))
 
     print(category_output)

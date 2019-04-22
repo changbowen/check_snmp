@@ -59,6 +59,53 @@ Exit Code | Status
 2 | CRITICAL
 3 | UNKNOWN
 
+### Config File Structure
+Fields indicated by `xxxxx` is customizable. 
+
+```
+{
+  "config": {
+    "global-list-bullet": "xxxx",                # bullet string before each item in a category
+                                                 # E.g. each disk item returned. Default is "  - "
+    "global-oid-separator": "xxxx",              # string to separate each sub item in an oid entry.
+                                                 # E.g. each piece of info of a disk. Default is ", "
+  },
+  "dell": {
+    "mib_dir": "xxxxxxxxxxxxxxxxxxxxxxxx",       # do not change these unless you know what you are doing
+    "mib": "xxxxxxxxxxxxxxx",                    # do not change these unless you know what you are doing
+    "categories": {
+      "xxxxxxxxx": {                             # category name can be any string
+        "description": "xxxxxxxxxxxxxxxxxx",
+        "oids": [
+          {
+            "oid": "xxxxxxxxxxxxxxxx",
+            "type": "text"                       # type can be "text" or "status"
+          },
+          {
+            "oid": "xxxxxxxxxxxxxxxx",
+            "type": "status",
+            "prefix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output
+            "suffix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output
+          },
+          {
+            "oid": "xxxxxxxxxxxxxxxx",
+            "type": "status"
+          },
+          ...
+          "list-bullet": "xxxx"                  # (optional) string to override the global list bullet
+          "oid-separator": "xxx",                # (optional) string to override the global oid separator
+        ],
+        "important": true                        # (optional) true or false
+      },
+      ...
+    }
+  },
+  "hpe": {
+    ...                                          # same structure as dell
+  }
+}
+```
+
 ### Loading MIB
 For Dell only one MIB module `IDRAC-MIB-SMIv2` needs to be specified in the snmpwalk command with `-m` option.
 
@@ -154,3 +201,4 @@ OID (numeric format) | OID Translation | Description
 
 [CPQHLTH-MIB treeview](http://www.oidview.com/mibs/232/CPQHLTH-MIB.html)
 
+[Perl check_hp](https://github.com/lairsdragon/check_hp/blob/master/check_hp)
