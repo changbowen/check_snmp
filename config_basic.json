@@ -19,13 +19,13 @@
       "processor": {
         "description": "Processor Status",
         "oids": [
-          { "oid": "processorDeviceStatus", "type": "status" }
+          { "oid": "systemStateProcessorDeviceStatusCombined", "type": "status" }
         ]
       },
       "memory": {
         "description": "Memory Status",
         "oids": [
-          { "oid": "memoryDeviceStatus", "type": "status" }
+          { "oid": "systemStateMemoryDeviceStatusCombined", "type": "status" }
         ]
       },
       "physicalDisk": {
@@ -49,25 +49,25 @@
       "cooling": {
         "description": "Cooling Status",
         "oids": [
-          { "oid": "coolingUnitStatus", "type": "status" }
+          { "oid": "systemStateCoolingDeviceStatusCombined", "type": "status" }
         ]
       },
       "temperature": {
         "description": "Temperature Status",
         "oids": [
-          { "oid": "temperatureProbeStatus", "type": "status" }
+          { "oid": "systemStateTemperatureStatusCombined", "type": "status" }
         ]
       },
       "powerSupply": {
         "description": "Power Supply Status",
         "oids": [
-          { "oid": "powerSupplyStatus", "type": "status" }
+          { "oid": "systemStatePowerSupplyStatusCombined", "type": "status" }
         ]
       },
       "battery": {
         "description": "Battery Status",
         "oids": [
-          { "oid": "systemBatteryStatus", "type": "status" }
+          { "oid": "systemStateBatteryStatusCombined", "type": "status" }
         ]
       }
     }
