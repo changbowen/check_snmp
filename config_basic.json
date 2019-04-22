@@ -31,7 +31,7 @@
       "physicalDisk": {
         "description": "Physical Disk Status",
         "oids": [
-          { "oid": "physicalDiskState", "type": "status", "prefix": "    - Health: " }
+          { "oid": "physicalDiskState", "type": "status" }
         ]
       },
       "virtualDisk": {
