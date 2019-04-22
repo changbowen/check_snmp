@@ -9,10 +9,11 @@ from collections import OrderedDict
 from typing import NamedTuple
 
 _parser = argparse.ArgumentParser()
-_parser.add_argument('-v', '--version', dest='version', help='The SNMP version to use.', default='2c')
-_parser.add_argument('-c', '--community', dest='community', help='The community string to use.', default='public')
-_parser.add_argument('-r', '--respect', dest='respect', help='Respect properties marked as important when other results contain errors.', action='store_true')
-_parser.add_argument('-f', '--format', dest='more_format', help='Include additional format like colors in the output.', action='store_true')
+_parser.add_argument('-v', '--version', help='The SNMP version to use.', default='2c')
+_parser.add_argument('-c', '--community', help='The community string to use.', default='public')
+_parser.add_argument('-r', '--respect', help='Respect properties marked as important when other results contain errors.', action='store_true')
+_parser.add_argument('-f', '--format', help='Include additional format like colors in the output.', action='store_true')
+_parser.add_argument('-b', '--brief', help='Output brief information (only combined status etc.).', action='store_true')
 _parser.add_argument('host', help='The host to connect to.')
 _parser.add_argument('--config', nargs='?', help='The configuration file to load.', default='config_default.json')
 _parser.add_argument('category', nargs='*', help='One or more of the categories from the configuration separated by spaces.')
@@ -23,169 +24,11 @@ args_Category = _args.category  # type: list
 args_Version = _args.version
 args_Community = _args.community
 args_RespectImp = _args.respect
-args_MoreFormat = _args.more_format
+args_MoreFormat = _args.format
+args_Brief = _args.brief
 
 # get base folder
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
-
-# definitions
-# config content moved to config_default.json
-# Config = {
-#     'dell': {
-#         'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/dell',
-#         'mib': 'IDRAC-MIB-SMIv2',
-#         'categories': OrderedDict([
-#             ('global', {
-#                 'description': 'Overall System Status',
-#                 'oids': [
-#                     {'oid': 'systemModelName', 'type': 'text'},
-#                     {'oid': 'systemServiceTag', 'type': 'text'},
-#                     {'oid': 'globalSystemStatus', 'type': 'status'},
-#                 ],
-#                 'important': True
-#             }),
-#             ('processor', {
-#                 'description': 'Processor Status',
-#                 'oids': [
-#                     {'oid': 'processorDeviceBrandName', 'type': 'text'},
-#                     {'oid': 'processorDeviceStatus', 'type': 'status'},
-#                 ],
-#             }),
-#             ('memory', {
-#                 'description': 'Memory Status',
-#                 'oids': [
-#                     {'oid': 'memoryDeviceLocationName', 'type': 'text'},
-#                     {'oid': 'memoryDeviceStatus', 'type': 'status'},
-#                 ],
-#             }),
-#             ('physicalDisk', {
-#                 'description': 'Physical Disk Status',
-#                 'oids': [
-#                     {'oid': 'physicalDiskDisplayName', 'type': 'text'},
-#                     {'oid': 'physicalDiskState', 'type': 'status'},
-#                 ],
-#             }),
-#             ('virtualDisk', {
-#                 'description': 'Virtual Disk Status',
-#                 'oids': [
-#                     {'oid': 'virtualDiskDisplayName', 'type': 'text'},
-#                     {'oid': 'virtualDiskState', 'type': 'status'},
-#                 ],
-#             }),
-#             ('storageController', {
-#                 'description': 'Storage Controller Status',
-#                 'oids': [
-#                     {'oid': 'controllerName', 'type': 'text'},
-#                     {'oid': 'controllerComponentStatus', 'type': 'status'},
-#                 ],
-#             }),
-#             ('cooling', {
-#                 'description': 'Cooling Status',
-#                 'oids': [
-#                     {'oid': 'coolingUnitName', 'type': 'text'},
-#                     {'oid': 'coolingUnitStatus', 'type': 'status'},
-#                 ],
-#             }),
-#             ('temperature', {
-#                 'description': 'Temperature Status',
-#                 'oids': [
-#                     {'oid': 'temperatureProbeLocationName', 'type': 'text'},
-#                     {'oid': 'temperatureProbeStatus', 'type': 'status'},
-#                 ],
-#             }),
-#             ('powerSupply', {
-#                 'description': 'Power Supply Status',
-#                 'oids': [
-#                     {'oid': 'powerSupplyLocationName', 'type': 'text'},
-#                     {'oid': 'powerSupplyStatus', 'type': 'status'},
-#                 ],
-#             }),
-#             ('battery', {
-#                 'description': 'Battery Status',
-#                 'oids': [
-#                     {'oid': 'systemBatteryLocationName', 'type': 'text'},
-#                     {'oid': 'systemBatteryStatus', 'type': 'status'},
-#                 ],
-#             }),
-#         ])
-#     },
-#     'hpe': {
-#         'mib_dir': 'mibs/default:mibs/iana:mibs/ietf:mibs/hpe',
-#         'mib': 'CPQSINFO-MIB:CPQHLTH-MIB:CPQIDA-MIB:CPQSTDEQ-MIB',
-#         'categories': OrderedDict([
-#             ('global', {
-#                 'description': 'Overall System Status',
-#                 'oids': [
-#                     {'oid': 'cpqSiProductName', 'type': 'text'},
-#                     {'oid': 'cpqSiSysSerialNum', 'type': 'text'},
-#                     {'oid': 'cpqHeMibCondition', 'type': 'status'},
-#                 ],
-#                 'important': True
-#             }),
-#             ('processor', {
-#                 'description': 'Processor Status',
-#                 'oids': [
-#                     {'oid': 'cpqSeCpuName', 'type': 'text'},
-#                     {'oid': 'cpqSeCpuStatus', 'type': 'status'},
-#                 ],
-#             }),
-#             ('memory', {
-#                 'description': 'Memory Status',
-#                 'oids': [
-#                     {'oid': 'cpqHeResMem2ModuleHwLocation', 'type': 'text'},
-#                     {'oid': 'cpqHeResMem2ModuleCondition', 'type': 'status'},
-#                 ],
-#             }),
-#             ('physicalDisk', {
-#                 'description': 'Physical Disk Status',
-#                 'oids': [
-#                     {'oid': 'cpqDaPhyDrvLocationString', 'type': 'text'},
-#                     {'oid': 'cpqDaPhyDrvCondition', 'type': 'status'},
-#                 ],
-#             }),
-#             ('virtualDisk', {
-#                 'description': 'Virtual Disk Status',
-#                 'oids': [
-#                     {'oid': 'cpqDaLogDrvCondition', 'type': 'status'},
-#                 ],
-#             }),
-#             ('storageController', {
-#                 'description': 'Storage Controller Status',
-#                 'oids': [
-#                     {'oid': 'cpqDaCntlrModel', 'type': 'text'},
-#                     {'oid': 'cpqDaCntlrCondition', 'type': 'status'},
-#                 ],
-#             }),
-#             ('cooling', {
-#                 'description': 'Cooling Status',
-#                 'oids': [
-#                     {'oid': 'cpqHeFltTolFanLocale', 'type': 'text'},
-#                     {'oid': 'cpqHeFltTolFanCondition', 'type': 'status'},
-#                 ],
-#             }),
-#             ('temperature', {
-#                 'description': 'Temperature Status',
-#                 'oids': [
-#                     {'oid': 'cpqHeTemperatureLocale', 'type': 'text'},
-#                     {'oid': 'cpqHeTemperatureCondition', 'type': 'status'},
-#                 ],
-#             }),
-#             ('powerSupply', {
-#                 'description': 'Power Supply Status',
-#                 'oids': [
-#                     {'oid': 'cpqHeFltTolPowerSupplyModel', 'type': 'text'},
-#                     {'oid': 'cpqHeFltTolPowerSupplyCondition', 'type': 'status'},
-#                 ],
-#             }),
-#             ('eventLog', {
-#                 'description': 'Integrated Management Log Status',
-#                 'oids': [
-#                     {'oid': 'cpqHeEventLogCondition', 'type': 'status'},
-#                 ],
-#             }),
-#         ]),
-#     }
-# }
 
 # load config file
 with open(args_Config, 'r') as config_file:
@@ -358,7 +201,8 @@ for category_key in vendor['categories']:
                                            col[2],
                                            col[3]))
 
-            category_output += list_bullet + oid_separator.join(cols) + '\n'
+            if not args_Brief:
+                category_output += list_bullet + oid_separator.join(cols) + '\n'
         category_output = category_output.format(combined_status=status_formatter(category_code, with_color=args_MoreFormat))
 
     print(category_output)
