@@ -159,7 +159,7 @@ HPE OIDs are much harder to collect since they are scattered into multiple MIBs 
 
 OID (numeric format) | OID Translation | Description
 ---| --- | ---
-1.3.6.1.4.1.232.6.1.3.0 | cpqHeMibCondition | Overall system condition
+1.3.6.1.4.1.232.6.1.3.0 | cpqHeMibCondition | Overall health condition
 1.3.6.1.4.1.232.3.1.3.0 | cpqDaMibCondition | Disk array condition
 1.3.6.1.4.1.232.6.2.11.2.0 | cpqHeEventLogCondition | Integrated Management Log condition
 1.3.6.1.4.1.232.18.1.3.0 | cpqNicMibCondition | NIC condition
@@ -167,7 +167,6 @@ OID (numeric format) | OID Translation | Description
 1.3.6.1.4.1.232.2.1.3.0 | cpqSiMibCondition | System information condition
 1.3.6.1.4.1.232.2.2.4.2 | cpqSiProductName | Model
 1.3.6.1.4.1.232.2.2.2.1 | cpqSiSysSerialNum | Serial number
-1.3.6.1.4.1.232.6.1.3.0 | cpqHeMibCondition | Overall health condition
 1.3.6.1.4.1.232.1.2.2.1.1.3 | cpqSeCpuName | CPU Model
 1.3.6.1.4.1.232.1.2.2.1.1.6 | cpqSeCpuStatus | CPU status
 1.3.6.1.4.1.232.6.2.14.13.1.13 | cpqHeResMem2ModuleHwLocation | Memory location
