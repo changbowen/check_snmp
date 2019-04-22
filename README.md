@@ -65,7 +65,7 @@ Fields indicated by `xxxxx` is customizable.
 ```
 {
   "config": {
-    "global-list-bullet": "xxxx",                # bullet string before each item in a category
+    "global-list-bullet": "xxxx",                # bullet string prepended for each item in a category
                                                  # E.g. each disk item returned. Default is "  - "
     "global-oid-separator": "xxxx",              # string to separate each sub item in an oid entry.
                                                  # E.g. each piece of info of a disk. Default is ", "
@@ -75,21 +75,14 @@ Fields indicated by `xxxxx` is customizable.
     "mib": "xxxxxxxxxxxxxxx",                    # do not change these unless you know what you are doing
     "categories": {
       "xxxxxxxxx": {                             # category name can be any string
+                                                 # used in the command line for category selection
         "description": "xxxxxxxxxxxxxxxxxx",
         "oids": [
           {
             "oid": "xxxxxxxxxxxxxxxx",
-            "type": "text"                       # type can be "text" or "status"
-          },
-          {
-            "oid": "xxxxxxxxxxxxxxxx",
-            "type": "status",
+            "type": "status",                    # type can be "text" or "status"
             "prefix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output
             "suffix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output
-          },
-          {
-            "oid": "xxxxxxxxxxxxxxxx",
-            "type": "status"
           },
           ...
           "list-bullet": "xxxx"                  # (optional) string to override the global list bullet
