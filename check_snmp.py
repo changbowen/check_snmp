@@ -187,10 +187,14 @@ for category_key in vendor['categories']:
 
     if len(category_result_raw) == 1 and len(category_result_raw[0]) == 1:  # there is only one status item without anything else
         col = category_result_raw[0][0]
-        category_output = category_output.format(combined_status=get_row_output(col[0],
-                                                                                col[1],
-                                                                                col[2],
-                                                                                col[3]))
+        row_output = get_row_output(col[0],
+                                    col[1],
+                                    col[2],
+                                    col[3])
+        if not args_Brief:
+            category_output = category_output.format(combined_status=row_output)
+        else:
+            category_output = category_output.format(combined_status=status_formatter(category_code, with_color=args_MoreFormat))
 
     else:
         for row in category_result_raw:  # row is like (('DIMM.Socket.A1', 'text'), ('failed', 'status'))
@@ -203,8 +207,9 @@ for category_key in vendor['categories']:
 
             if not args_Brief:
                 category_output += list_bullet + oid_separator.join(cols) + '\n'
+                
         category_output = category_output.format(combined_status=status_formatter(category_code, with_color=args_MoreFormat))
-
+    
     print(category_output)
 
     if imp: exitCodeImp = update_status_code(exitCodeImp, category_code)
