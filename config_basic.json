@@ -10,8 +10,6 @@
       "global": {
         "description": "Overall System Status",
         "oids": [
-          { "oid": "systemModelName", "type": "text" },
-          { "oid": "systemServiceTag", "type": "text" },
           { "oid": "globalSystemStatus", "type": "status" }
         ],
         "important": true
@@ -79,8 +77,6 @@
       "global": {
         "description": "Overall System Status",
         "oids": [
-          { "oid": "cpqSiProductName", "type": "text" },
-          { "oid": "cpqSiSysSerialNum", "type": "text" },
           { "oid": "cpqHeMibCondition", "type": "status" }
         ],
         "important": true

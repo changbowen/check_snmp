@@ -13,7 +13,7 @@ _parser.add_argument('-v', '--version', help='The SNMP version to use.', default
 _parser.add_argument('-c', '--community', help='The community string to use.', default='public')
 _parser.add_argument('-r', '--respect', help='Respect properties marked as important when other results contain errors.', action='store_true')
 _parser.add_argument('-f', '--format', help='Include additional format like colors in the output.', action='store_true')
-_parser.add_argument('-b', '--brief', help='Output brief information (only combined status etc.).', action='store_true')
+_parser.add_argument('-b', '--brief', help='Output brief information (only description and combined status).', action='store_true')
 _parser.add_argument('host', help='The host to connect to.')
 _parser.add_argument('--config', nargs='?', help='The configuration file to load.', default='config_default.json')
 _parser.add_argument('category', nargs='*', help='One or more of the categories from the configuration separated by spaces.')
@@ -34,9 +34,11 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 with open(args_Config, 'r') as config_file:
     Config = json.load(config_file, object_pairs_hook=OrderedDict)
 
+# status strings need to be all lower case
 StatusOK = ('ok', 'true', 'yes', 'on', 'online', 'spunup', 'full', 'ready', 'enabled', 'presence', 'non-raid', 'nonraid', '0', 'notapplicable')
 StatusWarning = ('noncritical', 'removed', 'foreign', 'offline', 'rebuild')
 StatusCritical = ('fail', 'failed', 'critical', 'nonrecoverable', 'notredundant', 'lost', 'degraded', 'redundancyoffline')
+
 StatusMap = {
     0: {'status': 'OK',         'color': '\033[32m{}\033[00m',  'severity': 0},  # green
     1: {'status': 'WARNING',    'color': '\033[33m{}\033[00m',  'severity': 2},  # orange
@@ -185,33 +187,29 @@ for category_key in vendor['categories']:
                                      oid.get('suffix')) for l in oid_result_raw.stdout.splitlines()])
     category_result_raw = [i for i in zip(*category_result_raw)]  # swap axis
 
+    # generate output
     if len(category_result_raw) == 1 and len(category_result_raw[0]) == 1:  # there is only one status item without anything else
         col = category_result_raw[0][0]
-        row_output = get_row_output(col[0],
-                                    col[1],
-                                    col[2],
-                                    col[3])
+        row_output = get_row_output(col[0], col[1], col[2], col[3])
         if not args_Brief:
-            category_output = category_output.format(combined_status=row_output)
+            combined_status = row_output
         else:
-            category_output = category_output.format(combined_status=status_formatter(category_code, with_color=args_MoreFormat))
-
+            combined_status = status_formatter(category_code, with_color=args_MoreFormat)
+        category_output = category_output.format(combined_status=combined_status)
     else:
         for row in category_result_raw:  # row is like (('DIMM.Socket.A1', 'text'), ('failed', 'status'))
             cols = []
             for col in row:  # col is like ('DIMM.Socket.A1', 'text')
-                cols.append(get_row_output(col[0],
-                                           col[1],
-                                           col[2],
-                                           col[3]))
+                cols.append(get_row_output(col[0], col[1], col[2], col[3]))
 
             if not args_Brief:
                 category_output += list_bullet + oid_separator.join(cols) + '\n'
-                
         category_output = category_output.format(combined_status=status_formatter(category_code, with_color=args_MoreFormat))
-    
+
+    # write output
     sys.stdout.write(category_output if args_Brief else category_output + '\n')
 
+    # set exit code
     if imp: exitCodeImp = update_status_code(exitCodeImp, category_code)
     exitCode = update_status_code(exitCode, category_code)
 

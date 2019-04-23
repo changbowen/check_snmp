@@ -2,12 +2,14 @@
 ## Python script / nagios plug-in that checks components status of Dell or HP servers with snmpwalk command
 
 ```
-usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f] [--config [CONFIG]]
+usage: check_snmp.py [-h] [-v VERSION] [-c COMMUNITY] [-r] [-f] [-b]
+                     [--config [CONFIG]]
                      host [category [category ...]]
 
 positional arguments:
   host                  The host to connect to.
-  category              One or more of the categories from the configuration separated by spaces.
+  category              One or more of the categories from the configuration
+                        separated by spaces.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -15,9 +17,14 @@ optional arguments:
                         The SNMP version to use.
   -c COMMUNITY, --community COMMUNITY
                         The community string to use.
-  -r, --respect         Respect properties marked as important when other results contain errors.
+  -r, --respect         Respect properties marked as important when other
+                        results contain errors.
   -f, --format          Include additional format like colors in the output.
+  -b, --brief           Output brief information (only description and
+                        combined status).
   --config [CONFIG]     The configuration file to load.
+
+
 ```
 
 For example `check_snmp.py -r -f 192.168.1.120`
