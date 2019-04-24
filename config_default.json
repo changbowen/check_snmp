@@ -106,6 +106,8 @@
         "description": "Processor Status",
         "oids": [
           { "oid": "cpqSeCpuName", "type": "text" },
+          { "oid": "cpqSeCpuCore", "type": "text", "suffix": " Cores" },
+          { "oid": "cpqSeCpuSpeed", "type": "text", "suffix": " MHz" },
           { "oid": "cpqSeCpuStatus", "type": "status" }
         ]
       },
