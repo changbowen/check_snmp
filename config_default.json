@@ -45,8 +45,12 @@
         "description": "Virtual Disk Status",
         "oids": [
           { "oid": "virtualDiskDisplayName", "type": "text" },
-          { "oid": "virtualDiskState", "type": "status" }
-        ]
+          { "oid": "virtualDiskLayout", "type": "text", "prefix": "    - RAID Type: " },
+          { "oid": "virtualDiskMediaType", "type": "text", "prefix": "    - Media: " },
+          { "oid": "virtualDiskState", "type": "status", "prefix": "    - Health: " }
+        ],
+        "list-bullet": "  + ",
+        "oid-separator": "\n"
       },
       "storageController": {
         "description": "Storage Controller Status",
@@ -122,9 +126,12 @@
       "virtualDisk": {
         "description": "Virtual Disk Status",
         "oids": [
-          { "oid": "cpqDaLogDrvCondition", "type": "status" },
-          { "oid": "cpqDaLogDrvStatus", "type": "text", "prefix": "Operation Status: " }
-        ]
+          { "oid": "cpqDaLogDrvFaultTol", "type": "text", "prefix": "RAID Type: " },
+          { "oid": "cpqDaLogDrvStatus", "type": "text", "prefix": "    - Operation Status: " },
+          { "oid": "cpqDaLogDrvCondition", "type": "status", "prefix": "    - Health: " }
+        ],
+        "list-bullet": "  + ",
+        "oid-separator": "\n"
       },
       "storageController": {
         "description": "Storage Controller Status",

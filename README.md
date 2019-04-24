@@ -52,6 +52,8 @@ As one of my earliest Python projects, feel free to fork and make your own impro
 
 To be used as a nagios plugin, do not specify the `-f` option so that the output is not embedded with the ANSI color codes. If the renderer does not support parsing the color codes, it will pollute the output.
 
+The value in the parentheses (E.g. `OK (ok)`) is the raw value returned from snmpwalk command.
+
 ### Return Value
 Integer value that is inline with the Nagios exit codes.
 
