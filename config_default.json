@@ -1,7 +1,13 @@
 {
   "config": {
+    "status-ok": [ "ok", "true", "yes", "on", "online", "spunup", "full", "ready", "enabled", "presence", "non-raid", "nonraid", "0", "notapplicable" ],
+    "status-warning": [ "noncritical", "removed", "foreign", "offline", "rebuild" ],
+    "status-critical": [ "fail", "failed", "critical", "nonrecoverable", "notredundant", "lost", "degraded", "redundancyoffline" ],
     "global-list-bullet": "  - ",
-    "global-oid-separator": ", "
+    "global-oid-separator": ", ",
+    "custom-mappings": {
+      "map-boolean": { "0": "ok", "1": "fail" }
+    }
   },
   "dell": {
     "mib_dir": "mibs/default:mibs/iana:mibs/ietf:mibs/dell",
@@ -35,6 +41,7 @@
         "oids": [
           { "oid": "physicalDiskDisplayName", "type": "text" },
           { "oid": "physicalDiskState", "type": "status", "prefix": "    - Health: " },
+          { "oid": "physicalDiskSmartAlertIndication", "type": "custom", "prefix": "    - Failing: ", "mapping": "map-boolean" },
           { "oid": "physicalDiskOperationalState", "type": "status", "prefix": "    - Operation: " },
           { "oid": "physicalDiskProgress", "type": "text", "prefix": "    - Progress: " }
         ],

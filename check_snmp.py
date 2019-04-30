@@ -34,10 +34,11 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 with open(args_Config, 'r') as config_file:
     Config = json.load(config_file, object_pairs_hook=OrderedDict)
 
-# status strings need to be all lower case
-StatusOK = ('ok', 'true', 'yes', 'on', 'online', 'spunup', 'full', 'ready', 'enabled', 'presence', 'non-raid', 'nonraid', '0', 'notapplicable')
-StatusWarning = ('noncritical', 'removed', 'foreign', 'offline', 'rebuild')
-StatusCritical = ('fail', 'failed', 'critical', 'nonrecoverable', 'notredundant', 'lost', 'degraded', 'redundancyoffline')
+CustomMappings = Config['config'].get('custom-mappings')  # type: OrderedDict[str, OrderedDict]
+
+StatusOK = Config['config']['status-ok']
+StatusWarning = Config['config']['status-warning']
+StatusCritical = Config['config']['status-critical']
 
 StatusMap = {
     0: {'status': 'OK',         'color': '\033[32m{}\033[00m',  'severity': 0},  # green
@@ -124,11 +125,20 @@ def status_formatter(status: int, alt_text: str = None, with_color: bool = True)
     return result
 
 
-def get_row_output(col_val_raw: str, col_type: str, col_prefix: str = None, col_suffix: str = None) -> str:
+def get_row_output(col_val_raw: str,
+                   col_type: str,
+                   col_prefix: str = None,
+                   col_suffix: str = None,
+                   col_mapping: str = None) -> str:
     if col_prefix is None: col_prefix = ''
     if col_suffix is None: col_suffix = ''
-    if col_type == 'status':
-        col_val = status_converter(col_val_raw)
+    if col_type == 'custom' and col_mapping is None: col_type = 'text'
+
+    if col_type in ('status', 'custom'):
+        if col_type == 'status':
+            col_val = status_converter(col_val_raw)
+        else:  # convert to status based on custom mapping
+            col_val = status_converter(CustomMappings[col_mapping][col_val_raw])
         global category_code
         category_code = update_status_code(category_code, col_val)
         result = status_formatter(col_val, StatusMap[col_val]['status'] + ' (' + col_val_raw + ')', args_MoreFormat)
@@ -184,13 +194,14 @@ for category_key in vendor['categories']:
         category_result_raw.append([(l.strip('" \n'),
                                      oid['type'],
                                      oid.get('prefix'),
-                                     oid.get('suffix')) for l in oid_result_raw.stdout.splitlines()])
+                                     oid.get('suffix'),
+                                     oid.get('mapping')) for l in oid_result_raw.stdout.splitlines()])
     category_result_raw = [i for i in zip(*category_result_raw)]  # swap axis
 
     # generate output
     if len(category_result_raw) == 1 and len(category_result_raw[0]) == 1:  # there is only one status item without anything else
         col = category_result_raw[0][0]
-        row_output = get_row_output(col[0], col[1], col[2], col[3])
+        row_output = get_row_output(col[0], col[1], col[2], col[3], col[4])
         if not args_Brief:
             combined_status = row_output
         else:
@@ -200,7 +211,7 @@ for category_key in vendor['categories']:
         for row in category_result_raw:  # row is like (('DIMM.Socket.A1', 'text'), ('failed', 'status'))
             cols = []
             for col in row:  # col is like ('DIMM.Socket.A1', 'text')
-                cols.append(get_row_output(col[0], col[1], col[2], col[3]))
+                cols.append(get_row_output(col[0], col[1], col[2], col[3], col[4]))
 
             if not args_Brief:
                 category_output += list_bullet + oid_separator.join(cols) + '\n'

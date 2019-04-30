@@ -1,5 +1,8 @@
 {
   "config": {
+    "status-ok": [ "ok", "true", "yes", "on", "online", "spunup", "full", "ready", "enabled", "presence", "non-raid", "nonraid", "0", "notapplicable" ],
+    "status-warning": [ "noncritical", "removed", "foreign", "offline", "rebuild" ],
+    "status-critical": [ "fail", "failed", "critical", "nonrecoverable", "notredundant", "lost", "degraded", "redundancyoffline" ],
     "global-list-bullet": "  - ",
     "global-oid-separator": ", "
   },

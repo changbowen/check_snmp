@@ -76,36 +76,43 @@ Fields indicated by `xxxxx` is customizable.
 ```
 {
   "config": {
-    "global-list-bullet": "xxxx",                # bullet string prepended for each item in a category
-                                                 # E.g. each disk item returned. Default is "  - "
+    "status-ok": [ "xxx", ... ]                  # status values that indicate OK. Values should be lower case.
+    "status-warning": [ "xxx", ... ]             # status values that indicate WARNING. Values should be lower case.
+    "status-critical": [ "xxx", ... ]            # status values that indicate CRITICAL. Values should be lower case.
+    "global-list-bullet": "xxxx",                # bullet string prepended for each item in a category.
+                                                 # E.g. each disk item returned. Default is "  - ".
     "global-oid-separator": "xxxx",              # string to separate each sub item in an oid entry.
-                                                 # E.g. each piece of info of a disk. Default is ", "
+                                                 # E.g. each piece of info of a disk. Default is ", ".
+    "custom-mappings": {
+      "xxxxxxxx": { "xx": "ok", "xx": "fail" }   # custom logic to convert raw value to standard status values (ok, fail, etc.). 
+    }
   },
   "dell": {
-    "mib_dir": "xxxxxxxxxxxxxxxxxxxxxxxx",       # do not change these unless you know what you are doing
-    "mib": "xxxxxxxxxxxxxxx",                    # do not change these unless you know what you are doing
+    "mib_dir": "xxxxxxxxxxxxxxxxxxxxxxxx",       # do not change these unless you know what you are doing.
+    "mib": "xxxxxxxxxxxxxxx",                    # do not change these unless you know what you are doing.
     "categories": {
-      "xxxxxxxxx": {                             # category name can be any string
-                                                 # used in the command line for category selection
+      "xxxxxxxxx": {                             # category name can be any string.
+                                                 # used in the command line for category selection.
         "description": "xxxxxxxxxxxxxxxxxx",
         "oids": [
           {
             "oid": "xxxxxxxxxxxxxxxx",
-            "type": "status",                    # type can be "text" or "status"
-            "prefix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output
-            "suffix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output
+            "type": "status",                    # type can be "text", "status", or "custom".
+            "prefix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output.
+            "suffix": "xxxxxxxxxxxx"             # (optional) used to annotate this oid and customize output.
+            "mapping": "xxxxxxxxxxxx"            # (optional for non-custom type) specify custom mapping to use for this oid.
           },
           ...
-          "list-bullet": "xxxx"                  # (optional) string to override the global list bullet
-          "oid-separator": "xxx",                # (optional) string to override the global oid separator
+          "list-bullet": "xxxx"                  # (optional) string to override the global list bullet.
+          "oid-separator": "xxx",                # (optional) string to override the global oid separator.
         ],
-        "important": true                        # (optional) true or false
+        "important": true                        # (optional) true or false.
       },
       ...
     }
   },
   "hpe": {
-    ...                                          # same structure as dell
+    ...                                          # same structure as dell.
   }
 }
 ```
