@@ -35,6 +35,7 @@ with open(args_Config, 'r') as config_file:
     Config = json.load(config_file, object_pairs_hook=OrderedDict)
 
 CustomMappings = Config['config'].get('custom-mappings')  # type: OrderedDict[str, OrderedDict]
+CustomConverters = Config['config'].get('custom-converters')  # type: OrderedDict[str, str]
 
 StatusOK = Config['config']['status-ok']
 StatusWarning = Config['config']['status-warning']
@@ -129,7 +130,8 @@ def get_row_output(col_val_raw: str,
                    col_type: str,
                    col_prefix: str = None,
                    col_suffix: str = None,
-                   col_mapping: str = None) -> str:
+                   col_mapping: str = None,
+                   col_converter: str = None) -> str:
     if col_prefix is None: col_prefix = ''
     if col_suffix is None: col_suffix = ''
     if col_type == 'custom' and col_mapping is None: col_type = 'text'
@@ -141,8 +143,12 @@ def get_row_output(col_val_raw: str,
             col_val = status_converter(CustomMappings[col_mapping][col_val_raw])
         global category_code
         category_code = update_status_code(category_code, col_val)
+        if col_converter is not None:
+            col_val_raw = eval(CustomConverters[col_converter].format(col_val_raw))  # apply converter at last
         result = status_formatter(col_val, StatusMap[col_val]['status'] + ' (' + col_val_raw + ')', args_MoreFormat)
     else:
+        if col_converter is not None:
+            col_val_raw = eval(CustomConverters[col_converter].format(col_val_raw))  # apply converter at last
         result = col_val_raw
     return col_prefix + result + col_suffix
 
@@ -195,13 +201,14 @@ for category_key in vendor['categories']:
                                      oid['type'],
                                      oid.get('prefix'),
                                      oid.get('suffix'),
-                                     oid.get('mapping')) for l in oid_result_raw.stdout.splitlines()])
+                                     oid.get('mapping'),
+                                     oid.get('converter')) for l in oid_result_raw.stdout.splitlines()])
     category_result_raw = [i for i in zip(*category_result_raw)]  # swap axis
 
     # generate output
     if len(category_result_raw) == 1 and len(category_result_raw[0]) == 1:  # there is only one status item without anything else
         col = category_result_raw[0][0]
-        row_output = get_row_output(col[0], col[1], col[2], col[3], col[4])
+        row_output = get_row_output(col[0], col[1], col[2], col[3], col[4], col[5])
         if not args_Brief:
             combined_status = row_output
         else:
@@ -211,7 +218,7 @@ for category_key in vendor['categories']:
         for row in category_result_raw:  # row is like (('DIMM.Socket.A1', 'text'), ('failed', 'status'))
             cols = []
             for col in row:  # col is like ('DIMM.Socket.A1', 'text')
-                cols.append(get_row_output(col[0], col[1], col[2], col[3], col[4]))
+                cols.append(get_row_output(col[0], col[1], col[2], col[3], col[4], col[5]))
 
             if not args_Brief:
                 category_output += list_bullet + oid_separator.join(cols) + '\n'

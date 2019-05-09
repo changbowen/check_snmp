@@ -83,8 +83,13 @@ Fields indicated by `xxxxx` is customizable.
                                                  # E.g. each disk item returned. Default is "  - ".
     "global-oid-separator": "xxxx",              # string to separate each sub item in an oid entry.
                                                  # E.g. each piece of info of a disk. Default is ", ".
-    "custom-mappings": {
-      "xxxxxxxx": { "xx": "ok", "xx": "fail" }   # custom logic to convert raw value to standard status values (ok, fail, etc.). 
+    "custom-mappings": {                         # (optional) custom logic to convert raw value to standard status values (ok, fail, etc.).
+      "xxxxxxxx": { "xx": "ok", "xx": "fail" },
+      ...
+    },
+    "custom-converters": {                       # (optional) custom python code applied to the oid result.
+      "xxxxxxxx": "xxxxxxxxxxx{0}xxxxxxx",       # the code will be used in eval() and {0} refers to the raw oid result.
+      ...
     }
   },
   "dell": {

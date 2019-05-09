@@ -4,16 +4,7 @@
     "status-warning": [ "noncritical", "removed", "foreign", "offline", "rebuild" ],
     "status-critical": [ "fail", "failed", "critical", "nonrecoverable", "notredundant", "lost", "degraded", "redundancyoffline" ],
     "global-list-bullet": "  - ",
-    "global-oid-separator": ", ",
-    "custom-mappings": {
-      "map-boolean": { "0": "ok", "1": "fail" }
-    },
-    "custom-converters": {
-      "str-upper": "str.upper('{0}')",
-      "floor-divide-1024": "str(round(int('{0}')//1024, 2))",
-      "floor-divide-1024sq": "str(round(int('{0}')//1048576, 2))",
-      "floor-divide-10": "str(round(int('{0}')//10, 2))"
-    }
+    "global-oid-separator": ", "
   },
   "dell": {
     "mib_dir": "mibs/default:mibs/iana:mibs/ietf:mibs/dell",
@@ -31,48 +22,30 @@
       "processor": {
         "description": "Processor Status",
         "oids": [
-          { "oid": "processorDeviceBrandName", "type": "text", "suffix": ", " },
-          { "oid": "processorDeviceCoreCount", "type": "text", "suffix": "C " },
-          { "oid": "processorDeviceThreadCount", "type": "text", "suffix": "T, " },
+          { "oid": "processorDeviceBrandName", "type": "text" },
           { "oid": "processorDeviceStatus", "type": "status" }
-        ],
-        "oid-separator": ""
-    },
+        ]
+      },
       "memory": {
         "description": "Memory Status",
         "oids": [
           { "oid": "memoryDeviceLocationName", "type": "text" },
-          { "oid": "memoryDeviceSize", "type": "text", "suffix": " GB", "converter": "floor-divide-1024sq" },
-          { "oid": "memoryDeviceSpeed", "type": "text", "suffix": " MHz" },
           { "oid": "memoryDeviceStatus", "type": "status" }
         ]
       },
       "physicalDisk": {
         "description": "Physical Disk Status",
         "oids": [
-          { "oid": "physicalDiskDisplayName", "type": "text", "suffix": "\n" },
-          { "oid": "physicalDiskManufacturer", "type": "text", "prefix": "    - Info: ", "suffix": " ", "converter": "str-upper" },
-          { "oid": "physicalDiskBusType", "type": "text", "suffix": " ", "converter": "str-upper" },
-          { "oid": "physicalDiskMediaType", "type": "text", "suffix": " ", "converter": "str-upper" },
-          { "oid": "physicalDiskCapacityInMB", "type": "text", "suffix": " GB\n", "converter": "floor-divide-1024" },
-          { "oid": "physicalDiskState", "type": "status", "prefix": "    - Health: ", "suffix": "\n" },
-          { "oid": "physicalDiskSmartAlertIndication", "type": "custom", "prefix": "    - Failing: ", "suffix": "\n", "mapping": "map-boolean" },
-          { "oid": "physicalDiskOperationalState", "type": "status", "prefix": "    - Operation: ", "suffix": "\n" },
-          { "oid": "physicalDiskProgress", "type": "text", "prefix": "    - Progress: " }
-        ],
-        "list-bullet": "  + ",
-        "oid-separator": ""
+          { "oid": "physicalDiskDisplayName", "type": "text" },
+          { "oid": "physicalDiskState", "type": "status" }
+        ]
       },
       "virtualDisk": {
         "description": "Virtual Disk Status",
         "oids": [
           { "oid": "virtualDiskDisplayName", "type": "text" },
-          { "oid": "virtualDiskLayout", "type": "text", "prefix": "    - RAID Type: " },
-          { "oid": "virtualDiskMediaType", "type": "text", "prefix": "    - Media: " },
-          { "oid": "virtualDiskState", "type": "status", "prefix": "    - Health: " }
-        ],
-        "list-bullet": "  + ",
-        "oid-separator": "\n"
+          { "oid": "virtualDiskState", "type": "status" }
+        ]
       },
       "storageController": {
         "description": "Storage Controller Status",
@@ -81,41 +54,24 @@
           { "oid": "controllerComponentStatus", "type": "status" }
         ]
       },
-      "coolingUnit": {
-        "description": "Cooling Unit Status",
+      "cooling": {
+        "description": "Cooling Status",
         "oids": [
           { "oid": "coolingUnitName", "type": "text" },
           { "oid": "coolingUnitStatus", "type": "status" }
-        ]
-      },
-      "coolingDevice": {
-        "description": "Cooling Device Status",
-        "oids": [
-          { "oid": "coolingDeviceLocationName", "type": "text" },
-          { "oid": "coolingDeviceReading", "type": "text", "suffix": " RPM" },
-          { "oid": "coolingDeviceStatus", "type": "status" }
         ]
       },
       "temperature": {
         "description": "Temperature Status",
         "oids": [
           { "oid": "temperatureProbeLocationName", "type": "text" },
-          { "oid": "temperatureProbeReading", "type": "text", "converter": "floor-divide-10", "suffix": " °C" },
           { "oid": "temperatureProbeStatus", "type": "status" }
-        ]
-      },
-      "powerUnit": {
-        "description": "Power Unit Status",
-        "oids": [
-          { "oid": "powerUnitName", "type": "text" },
-          { "oid": "powerUnitStatus", "type": "status" }
         ]
       },
       "powerSupply": {
         "description": "Power Supply Status",
         "oids": [
           { "oid": "powerSupplyLocationName", "type": "text" },
-          { "oid": "powerSupplyCurrentInputVoltage", "type": "text", "suffix": " V" },
           { "oid": "powerSupplyStatus", "type": "status" }
         ]
       },
@@ -145,8 +101,6 @@
         "description": "Processor Status",
         "oids": [
           { "oid": "cpqSeCpuName", "type": "text" },
-          { "oid": "cpqSeCpuCore", "type": "text", "suffix": " Cores" },
-          { "oid": "cpqSeCpuSpeed", "type": "text", "suffix": " MHz" },
           { "oid": "cpqSeCpuStatus", "type": "status" }
         ]
       },
@@ -167,12 +121,8 @@
       "virtualDisk": {
         "description": "Virtual Disk Status",
         "oids": [
-          { "oid": "cpqDaLogDrvFaultTol", "type": "text", "prefix": "RAID Type: " },
-          { "oid": "cpqDaLogDrvStatus", "type": "text", "prefix": "    - Operation Status: " },
-          { "oid": "cpqDaLogDrvCondition", "type": "status", "prefix": "    - Health: " }
-        ],
-        "list-bullet": "  + ",
-        "oid-separator": "\n"
+          { "oid": "cpqDaLogDrvCondition", "type": "status" }
+        ]
       },
       "storageController": {
         "description": "Storage Controller Status",
