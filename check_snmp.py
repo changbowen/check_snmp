@@ -7,6 +7,14 @@ import argparse
 import json
 from collections import OrderedDict
 from typing import NamedTuple
+import shutil
+
+def print_and_exit(msg: str, code: int):
+    print(msg)
+    sys.exit(code)
+
+if shutil.which('snmpgetnext') is None:
+    print_and_exit('SNMP package is not found on the system. Please install SNMP and try again.', 3)
 
 _parser = argparse.ArgumentParser()
 _parser.add_argument('-v', '--version', help='The SNMP version to use.', default='2c')
@@ -63,11 +71,6 @@ def run(cmd: SnmpCommand) -> SnmpResult:
     _proc = subprocess.run(cmdlst, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     _result = SnmpResult(str(_proc.stdout, 'utf-8').strip(), str(_proc.stderr, 'utf-8').strip())
     return _result
-
-
-def print_and_exit(msg: str, code: int):
-    print(msg)
-    sys.exit(code)
 
 
 def status_converter(status: any) -> int:
