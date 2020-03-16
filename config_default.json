@@ -22,10 +22,14 @@
       "global": {
         "description": "Overall System Status",
         "oids": [
-          { "oid": "systemModelName", "type": "text" },
-          { "oid": "systemServiceTag", "type": "text" },
-          { "oid": "globalSystemStatus", "type": "status" }
+          { "oid": "systemModelName", "type": "text", "suffix": ", " },
+          { "oid": "systemServiceTag", "type": "text", "suffix": "\n" },
+          { "oid": "systemFQDN", "type": "text", "prefix": "  - ", "suffix": ", " },
+          { "oid": "systemOSName", "type": "text", "suffix": " " },
+          { "oid": "systemOSVersion", "type": "text", "prefix": "v", "suffix": "\n" },
+          { "oid": "globalSystemStatus", "type": "status", "prefix": "  - Overall health: " }
         ],
+        "oid-separator": "",
         "important": true
       },
       "processor": {
